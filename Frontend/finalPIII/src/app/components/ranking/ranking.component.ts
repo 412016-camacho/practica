@@ -18,7 +18,7 @@ export class RankingComponent implements OnInit, OnDestroy {
   private subscription: Subscription | null = null;
 
   rankingItems: RankingItem[] = [];
-  topFilter = 10;
+  topFilter: number | null = 10;
   loading = false;
   error: string | null = null;
 
@@ -40,7 +40,10 @@ export class RankingComponent implements OnInit, OnDestroy {
       this.subscription.unsubscribe();
     }
 
-    this.subscription = this.gameApiService.getRanking(this.topFilter).subscribe({
+    // Si topFilter es null o 0, obtener todos (pasar un número muy grande)
+    const top = this.topFilter && this.topFilter > 0 ? this.topFilter : 999999;
+
+    this.subscription = this.gameApiService.getRanking(top).subscribe({
       next: (data) => {
         this.rankingItems = data.items;
         this.loading = false;
@@ -54,7 +57,8 @@ export class RankingComponent implements OnInit, OnDestroy {
 
   onTopFilterChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.topFilter = +select.value;
+    const value = select.value;
+    this.topFilter = value === 'all' ? null : +value;
     this.loadRanking();
   }
 

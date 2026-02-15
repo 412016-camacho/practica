@@ -11,13 +11,14 @@
       <div class="flex items-center gap-4">
         <label class="text-purple-200">Mostrar top:</label>
         <select
-          [value]="topFilter"
+          [value]="topFilter === null ? 'all' : topFilter"
           (change)="onTopFilterChange($event)"
           class="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-pink-500">
           <option value="5" class="bg-purple-900">5</option>
           <option value="10" class="bg-purple-900">10</option>
           <option value="20" class="bg-purple-900">20</option>
           <option value="50" class="bg-purple-900">50</option>
+          <option value="all" class="bg-purple-900">Todos</option>
         </select>
       </div>
       <div class="flex gap-2">

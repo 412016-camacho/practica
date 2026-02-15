@@ -1,0 +1,138 @@
+<div class="space-y-4">
+  @if (game) {
+    <!-- Status Card -->
+    <div class="rounded-xl p-6 border" [class]="getStatusClass()">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-white">{{ game.playerName }}</h2>
+        <span class="text-lg font-bold px-4 py-1 rounded-full"
+          [class.bg-green-500]="game.status === 'WON'"
+          [class.bg-red-500]="game.status === 'LOST'"
+          [class.bg-blue-500]="game.status === 'IN_PROGRESS'"
+          [class.text-white]="true">
+          {{ getStatusText() }}
+        </span>
+      </div>
+
+      <!-- Position Track -->
+      <div class="mb-4">
+        <div class="flex justify-between text-purple-300 text-sm mb-1">
+          <span>Posición: {{ game.position }} / 29</span>
+          <span>Turno: {{ game.turnNumber }}</span>
+        </div>
+        <div class="h-4 bg-white/10 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+            [style.width.%]="getPositionPercentage()">
+          </div>
+        </div>
+        <div class="flex justify-between text-xs text-purple-400 mt-1">
+          <span>Inicio</span>
+          <span>Meta</span>
+        </div>
+      </div>
+
+      <!-- Life Bar -->
+      <div class="mb-4">
+        <div class="flex justify-between text-purple-300 text-sm mb-1">
+          <span>Vida</span>
+          <span class="font-bold text-pink-400">{{ game.life }} / 10</span>
+        </div>
+        <div class="h-4 bg-white/10 rounded-full overflow-hidden">
+          <div
+            class="h-full transition-all duration-500"
+            [class]="getLifeColor()"
+            [style.width.%]="getLifePercentage()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Last Turn Info -->
+      @if (lastTurn) {
+        <div class="bg-white/5 rounded-lg p-4 mb-4">
+          <h3 class="text-sm font-bold text-purple-300 mb-2">Último Turno</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <p class="text-xs text-purple-400">Dado</p>
+              <p class="text-2xl font-bold text-yellow-400">{{ lastTurn.dice }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-purple-400">Movimiento</p>
+              <p class="text-lg font-bold text-white">{{ lastTurn.fromPosition }} → {{ lastTurn.toPosition }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-purple-400">Casilla</p>
+              <p class="text-lg font-bold" [class]="getCellTypeClass()">{{ getCellTypeText() }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-purple-400">Cambio Vida</p>
+              <p class="text-lg font-bold" [class]="getDeltaClass()">{{ getDeltaText() }}</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Game Over Message -->
+      @if (isGameOver()) {
+        <div class="text-center py-4">
+          @switch (game.status) {
+            @case ('WON') {
+              <div class="text-green-400">
+                <p class="text-3xl mb-2">🎉</p>
+                <p class="text-xl font-bold">¡Felicidades! Has completado el camino</p>
+                <p class="text-sm text-green-300 mt-1">Vida final: {{ game.life }} | Turnos: {{ game.turnNumber }}</p>
+              </div>
+            }
+            @case ('LOST') {
+              <div class="text-red-400">
+                <p class="text-3xl mb-2">💔</p>
+                <p class="text-xl font-bold">¡Has perdido!</p>
+                <p class="text-sm text-red-300 mt-1">Tu vida llegó a cero en el turno {{ game.turnNumber }}</p>
+              </div>
+            }
+          }
+        </div>
+      }
+
+      <!-- Play Controls -->
+      @if (!isGameOver()) {
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <input
+              type="checkbox"
+              id="useDiceOverride"
+              [checked]="useDiceOverride"
+              (change)="onDiceOverrideChange($event)"
+              class="w-4 h-4 text-pink-500 bg-white/10 border-white/20 rounded focus:ring-pink-500">
+            <label for="useDiceOverride" class="text-purple-200 text-sm">
+              Usar dado específico
+            </label>
+            @if (useDiceOverride) {
+              <select
+                [(ngModel)]="diceOverride"
+                class="px-3 py-1 rounded bg-white/10 border border-white/20 text-white focus:outline-none focus:border-pink-500">
+                <option value="" class="bg-purple-900">Elige...</option>
+                <option value="1" class="bg-purple-900">1</option>
+                <option value="2" class="bg-purple-900">2</option>
+                <option value="3" class="bg-purple-900">3</option>
+                <option value="4" class="bg-purple-900">4</option>
+                <option value="5" class="bg-purple-900">5</option>
+                <option value="6" class="bg-purple-900">6</option>
+              </select>
+            }
+          </div>
+
+          <button
+            (click)="onPlayTurn()"
+            [disabled]="loading || (useDiceOverride && !diceOverride)"
+            class="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">
+            @if (loading) {
+              Tirando dado...
+            } @else {
+              🎲 Jugar Turno
+            }
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

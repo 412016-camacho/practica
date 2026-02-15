@@ -1,0 +1,94 @@
+<div class="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 p-4 md:p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-white mb-2">Ranking</h1>
+      <p class="text-purple-200">Los mejores jugadores del Camino de los Corazones</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center gap-4">
+        <label class="text-purple-200">Mostrar top:</label>
+        <select
+          [value]="topFilter"
+          (change)="onTopFilterChange($event)"
+          class="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-pink-500">
+          <option value="5" class="bg-purple-900">5</option>
+          <option value="10" class="bg-purple-900">10</option>
+          <option value="20" class="bg-purple-900">20</option>
+          <option value="50" class="bg-purple-900">50</option>
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <button
+          (click)="onRefresh()"
+          class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+          Actualizar
+        </button>
+        <button
+          (click)="goToHome()"
+          class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+          Nueva Partida
+        </button>
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+      </div>
+    }
+
+    @if (error) {
+      <div class="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4">
+        {{ error }}
+      </div>
+    }
+
+    @if (!loading && !error) {
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
+        @if (rankingItems.length === 0) {
+          <div class="text-center py-12 text-purple-300">
+            <p class="text-xl mb-2">No hay partidas ganadas aun</p>
+            <p class="text-sm">Se el primero en completar el camino!</p>
+          </div>
+        } @else {
+          <table class="w-full">
+            <thead class="bg-white/5">
+              <tr class="text-left text-purple-300 text-sm uppercase">
+                <th class="px-6 py-4">#</th>
+                <th class="px-6 py-4">Jugador</th>
+                <th class="px-6 py-4 text-center">Turnos</th>
+                <th class="px-6 py-4 text-center">Vida Final</th>
+                <th class="px-6 py-4 text-center">Puntuacion</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of rankingItems; track item.gameId; let i = $index) {
+                <tr class="border-t border-white/10 hover:bg-white/5 transition-colors [class.bg-yellow-500/10]=i === 0 [class.bg-gray-400/10]=i === 1 [class.bg-orange-400/10]=i === 2">
+                  <td class="px-6 py-4 text-white font-bold">
+                    <span class="mr-2">{{ getMedalEmoji(i) }}</span>
+                    {{ i + 1 }}
+                  </td>
+                  <td class="px-6 py-4 text-white font-semibold">{{ item.playerName }}</td>
+                  <td class="px-6 py-4 text-center text-purple-300">{{ item.turnNumber }}</td>
+                  <td class="px-6 py-4 text-center text-pink-400 font-bold">{{ item.lifeAfter }}</td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold px-3 py-1 rounded-full">
+                      {{ item.score }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <div class="mt-6 text-center text-purple-300 text-sm">
+        <p>Puntuacion = (Vida Final x 10) - Turnos</p>
+      </div>
+    }
+  </div>
+</div>
